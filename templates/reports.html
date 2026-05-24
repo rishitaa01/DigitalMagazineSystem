@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+{% block title %}Reports & Analytics{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h2><span class="header-icon">📈</span> Reports & Analytics</h2>
+</div>
+
+<!-- Summary Stats -->
+<div class="report-stats">
+  <div class="report-stat">
+    <div>📕</div>
+    <div class="stat-value" style="background:var(--gradient-1);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">
+      {% if most_subscribed %}{{ most_subscribed['title'] }}{% else %}—{% endif %}
+    </div>
+    <div class="stat-label">Most Subscribed Magazine
+      {% if most_subscribed %}({{ most_subscribed['sub_count'] }} subs){% endif %}
+    </div>
+  </div>
+  <div class="report-stat">
+    <div>💰</div>
+    <div class="stat-value">${{ '%.2f'|format(avg_price['avg_price'] or 0) }}</div>
+    <div class="stat-label">Average Magazine Price</div>
+  </div>
+  <div class="report-stat">
+    <div>✅</div>
+    <div class="stat-value" style="color:var(--success);">{{ active_subs }}</div>
+    <div class="stat-label">Active Subscriptions</div>
+  </div>
+  <div class="report-stat">
+    <div>❌</div>
+    <div class="stat-value" style="color:var(--error);">{{ expired_subs }}</div>
+    <div class="stat-label">Expired Subscriptions</div>
+  </div>
+  <div class="report-stat">
+    <div>🏆</div>
+    <div class="stat-value">
+      {% if max_price_mag %}{{ max_price_mag['title'] }}{% else %}—{% endif %}
+    </div>
+    <div class="stat-label">Highest Priced Magazine
+      {% if max_price_mag %}(${{ '%.2f'|format(max_price_mag['max_price'] or 0) }}){% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Charts -->
+<div class="charts-grid">
+  <div class="card">
+    <div class="card-header">📊 Articles per Magazine (GROUP BY)</div>
+    <div class="card-body">
+      <div class="chart-container">
+        <canvas id="articles-chart"
+          data-labels='{{ articles_per_mag|map(attribute="title")|list|tojson }}'
+          data-values='{{ articles_per_mag|map(attribute="article_count")|list|tojson }}'>
+        </canvas>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header">📈 Subscription Growth (by Month)</div>
+    <div class="card-body">
+      <div class="chart-container">
+        <canvas id="subscriptions-chart"
+          data-labels='{{ sub_by_month|map(attribute="month")|list|tojson }}'
+          data-values='{{ sub_by_month|map(attribute="count")|list|tojson }}'>
+        </canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Top Authors Leaderboard -->
+<div class="card">
+  <div class="card-header">🏆 Top Authors by Article Count (HAVING COUNT ≥ 1)</div>
+  <div class="card-body">
+    {% if top_authors %}
+    {% for a in top_authors %}
+    <div class="leaderboard-item">
+      <div class="leaderboard-rank {% if loop.index == 1 %}rank-1{% elif loop.index == 2 %}rank-2{% elif loop.index == 3 %}rank-3{% else %}rank-other{% endif %}">
+        {{ loop.index }}
+      </div>
+      <div class="leaderboard-name">{{ a['name'] }}</div>
+      <div class="leaderboard-count">{{ a['article_count'] }} articles</div>
+    </div>
+    {% endfor %}
+    {% else %}
+    <div class="empty-state"><p>No author data available.</p></div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Article Log (Trigger Demo) -->
+<div class="card">
+  <div class="card-header">⚡ Article Log (TRIGGER: after_article_insert)</div>
+  <div class="card-body">
+    <p style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:14px;">
+      Every time a new article is inserted, the trigger automatically logs it here.
+    </p>
+    {% if article_log %}
+    <div class="table-wrapper">
+      <table>
+        <thead><tr><th>Log ID</th><th>Article Name</th><th>Action Time</th></tr></thead>
+        <tbody>
+          {% for l in article_log %}
+          <tr>
+            <td>{{ l['log_id'] }}</td>
+            <td>{{ l['article_name'] }}</td>
+            <td>{{ l['action_time'] }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty-state"><p>No log entries yet. Add an article to see the trigger fire.</p></div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Article Details View -->
+<div class="card">
+  <div class="card-header">👁️ Article_Details VIEW (JOIN: Article + Author + Magazine + Editor)</div>
+  <div class="card-body">
+    <p style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:14px;">
+      SQL View joining ARTICLE, AUTHOR (via WRITES), MAGAZINE, and EDITOR (via EDITS).
+    </p>
+    {% if article_view %}
+    <div class="table-wrapper">
+      <table>
+        <thead><tr><th>Article</th><th>Magazine</th><th>Category</th><th>Author(s)</th><th>Editor(s)</th><th>Pages</th></tr></thead>
+        <tbody>
+          {% for a in article_view %}
+          <tr>
+            <td>{{ a['article_title'] }}</td>
+            <td>{{ a['magazine_title'] or '—' }}</td>
+            <td><span class="badge badge-monthly">{{ a['magazine_category'] or '—' }}</span></td>
+            <td>{{ a['author_names'] or '—' }}</td>
+            <td>{{ a['editor_names'] or '—' }}</td>
+            <td>{{ a['pages'] }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty-state"><p>No view data.</p></div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

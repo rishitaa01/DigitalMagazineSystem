@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: magazine-system
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: MYSQLHOST
+        sync: false
+      - key: MYSQLUSER
+        sync: false
+      - key: MYSQLPASSWORD
+        sync: false
+      - key: MYSQLDATABASE
+        sync: false
+      - key: MYSQLPORT
+        sync: false

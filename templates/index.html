@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h2><span class="header-icon">📊</span> Dashboard</h2>
+</div>
+
+<!-- Stats Grid -->
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-icon">📕</div>
+    <div class="stat-value">{{ stats.magazines }}</div>
+    <div class="stat-label">Magazines</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon">📝</div>
+    <div class="stat-value">{{ stats.articles }}</div>
+    <div class="stat-label">Articles</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon">✍️</div>
+    <div class="stat-value">{{ stats.authors }}</div>
+    <div class="stat-label">Authors</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon">🏢</div>
+    <div class="stat-value">{{ stats.publishers }}</div>
+    <div class="stat-label">Publishers</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon">🔍</div>
+    <div class="stat-value">{{ stats.editors }}</div>
+    <div class="stat-label">Editors</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon">👥</div>
+    <div class="stat-value">{{ stats.subscribers }}</div>
+    <div class="stat-label">Subscribers</div>
+  </div>
+</div>
+
+<!-- Latest Magazines -->
+<div class="card">
+  <div class="card-header">
+    <span>📕 Latest Magazines</span>
+    <a href="{{ url_for('magazines') }}" class="btn btn-sm btn-primary">View All</a>
+  </div>
+  <div class="card-body">
+    {% if latest_magazines %}
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Title</th><th>Category</th><th>Language</th>
+            <th>Price</th><th>Published</th><th>Publisher</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for m in latest_magazines %}
+          <tr>
+            <td><a href="{{ url_for('magazine_detail', mag_id=m['mag_id']) }}">{{ m['title'] }}</a></td>
+            <td><span class="badge badge-monthly">{{ m['category'] }}</span></td>
+            <td>{{ m['language'] }}</td>
+            <td>${{ '%.2f'|format(m['price']) }}</td>
+            <td>{{ m['p_date'] }}</td>
+            <td>{{ m['publisher_name'] or '—' }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-icon">📕</div>
+      <p>No magazines yet. <a href="{{ url_for('magazines') }}">Add one</a>.</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Recent Articles -->
+<div class="card">
+  <div class="card-header">
+    <span>📝 Recent Articles (from Article_Details View)</span>
+    <a href="{{ url_for('articles') }}" class="btn btn-sm btn-primary">View All</a>
+  </div>
+  <div class="card-body">
+    {% if recent_articles %}
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Article</th><th>Magazine</th><th>Author(s)</th>
+            <th>Editor(s)</th><th>Pages</th><th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for a in recent_articles %}
+          <tr>
+            <td>{{ a['article_title'] }}</td>
+            <td>{{ a['magazine_title'] or '—' }}</td>
+            <td>{{ a['author_names'] or '—' }}</td>
+            <td>{{ a['editor_names'] or '—' }}</td>
+            <td>{{ a['pages'] }}</td>
+            <td>{{ a['article_date'] }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-icon">📝</div>
+      <p>No articles yet.</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

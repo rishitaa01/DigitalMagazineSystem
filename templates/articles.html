@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% block title %}Articles{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h2><span class="header-icon">📝</span> Articles</h2>
+</div>
+
+<!-- Add Article Form -->
+<div class="card">
+  <div class="card-header">➕ Add New Article</div>
+  <div class="card-body">
+    <form method="POST" action="{{ url_for('articles') }}">
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="title">Title</label>
+          <input type="text" id="title" name="title" required placeholder="Article title">
+        </div>
+        <div class="form-group">
+          <label for="pages">Pages</label>
+          <input type="number" id="pages" name="pages" min="1" required placeholder="e.g. 10">
+        </div>
+        <div class="form-group">
+          <label for="p_date">Publication Date</label>
+          <input type="date" id="p_date" name="p_date" required>
+        </div>
+        <div class="form-group">
+          <label for="mag_id">Magazine</label>
+          <select id="mag_id" name="mag_id" required>
+            <option value="">— Select Magazine —</option>
+            {% for m in magazines %}
+            <option value="{{ m['mag_id'] }}">{{ m['title'] }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="author_ids">Authors (hold Ctrl to multi-select)</label>
+          <select id="author_ids" name="author_ids" multiple required>
+            {% for a in authors %}
+            <option value="{{ a['author_id'] }}">{{ a['name'] }} — {{ a['specialization'] }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="editor_id">Editor</label>
+          <select id="editor_id" name="editor_id">
+            <option value="">— Select Editor —</option>
+            {% for e in editors %}
+            <option value="{{ e['editor_id'] }}">{{ e['name'] }} ({{ e['experience'] }} yrs)</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">➕ Add Article</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Search & Filter -->
+<div class="card">
+  <div class="card-header">📝 All Articles ({{ articles|length }})</div>
+  <div class="card-body">
+    <div class="search-bar">
+      <form method="GET" action="{{ url_for('articles') }}" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+        <input type="text" name="search" placeholder="🔍 Search by title or author..." value="{{ search }}">
+        <select name="mag_id">
+          <option value="">All Magazines</option>
+          {% for m in magazines %}
+          <option value="{{ m['mag_id'] }}" {% if mag_filter == m['mag_id']|string %}selected{% endif %}>{{ m['title'] }}</option>
+          {% endfor %}
+        </select>
+        <button type="submit" class="btn btn-primary btn-sm">Search</button>
+        {% if search or mag_filter %}
+        <a href="{{ url_for('articles') }}" class="btn btn-sm btn-edit">Clear</a>
+        {% endif %}
+      </form>
+      <input type="text" id="live-search" placeholder="⚡ Live filter..." style="margin-left:auto;">
+    </div>
+
+    {% if articles %}
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr><th>ID</th><th>Title</th><th>Magazine</th><th>Author(s)</th><th>Editor(s)</th><th>Pages</th><th>Date</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+          {% for a in articles %}
+          <tr>
+            <td>{{ a['article_id'] }}</td>
+            <td>{{ a['article_title'] }}</td>
+            <td><span class="badge badge-yearly">{{ a['magazine_title'] or '—' }}</span></td>
+            <td>{{ a['author_names'] or '—' }}</td>
+            <td>{{ a['editor_names'] or '—' }}</td>
+            <td>{{ a['pages'] }}</td>
+            <td>{{ a['article_date'] }}</td>
+            <td>
+              <form method="POST" action="{{ url_for('delete_record', table='article', record_id=a['article_id']) }}" class="delete-form" style="display:inline;">
+                <button type="submit" class="btn btn-sm btn-delete">🗑️</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty-state"><div class="empty-icon">📝</div><p>No articles found.</p></div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

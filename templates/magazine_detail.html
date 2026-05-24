@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% block title %}{{ magazine['title'] }}{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h2><span class="header-icon">📕</span> {{ magazine['title'] }}</h2>
+  <a href="{{ url_for('magazines') }}" class="btn btn-sm btn-edit">← Back to Magazines</a>
+</div>
+
+<!-- Magazine Info -->
+<div class="card">
+  <div class="card-header">Magazine Details</div>
+  <div class="card-body">
+    <div class="detail-info">
+      <div class="detail-meta">
+        <span>📂 <strong>Category:</strong> {{ magazine['category'] }}</span>
+        <span>🌐 <strong>Language:</strong> {{ magazine['language'] }}</span>
+        <span>💰 <strong>Price:</strong> ${{ '%.2f'|format(magazine['price']) }}</span>
+        <span>📅 <strong>Published:</strong> {{ magazine['p_date'] }}</span>
+        <span>🏢 <strong>Publisher:</strong> {{ magazine['publisher_name'] or '—' }}</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Articles in this Magazine -->
+<div class="card">
+  <div class="card-header">📝 Articles ({{ articles|length }})</div>
+  <div class="card-body">
+    {% if articles %}
+    <div class="table-wrapper">
+      <table>
+        <thead><tr><th>Title</th><th>Author(s)</th><th>Editor(s)</th><th>Pages</th><th>Date</th></tr></thead>
+        <tbody>
+          {% for a in articles %}
+          <tr>
+            <td>{{ a['article_title'] }}</td>
+            <td>{{ a['author_names'] or '—' }}</td>
+            <td>{{ a['editor_names'] or '—' }}</td>
+            <td>{{ a['pages'] }}</td>
+            <td>{{ a['article_date'] }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty-state"><div class="empty-icon">📝</div><p>No articles for this magazine yet.</p></div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Subscribers -->
+<div class="card">
+  <div class="card-header">👥 Subscribers ({{ subscribers|length }})</div>
+  <div class="card-body">
+    {% if subscribers %}
+    <div class="table-wrapper">
+      <table>
+        <thead><tr><th>Name</th><th>Email</th><th>Start Date</th><th>End Date</th><th>Status</th></tr></thead>
+        <tbody>
+          {% for s in subscribers %}
+          <tr>
+            <td>{{ s['name'] }}</td>
+            <td>{{ s['email'] }}</td>
+            <td>{{ s['start_date'] }}</td>
+            <td>{{ s['end_date'] }}</td>
+            <td>
+              {% if s['end_date'] >= now %}
+              <span class="badge badge-active">Active</span>
+              {% else %}
+              <span class="badge badge-expired">Expired</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty-state"><div class="empty-icon">👥</div><p>No subscribers for this magazine.</p></div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}Edit {{ table|capitalize }}{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h2><span class="header-icon">✏️</span> Edit {{ table|capitalize }}</h2>
+  {% set back_routes = {'publisher':'publishers','magazine':'magazines','author':'authors','editor':'editors','subscriber':'subscribers'} %}
+  <a href="{{ url_for(back_routes[table]) }}" class="btn btn-sm btn-edit">← Back</a>
+</div>
+
+<div class="card">
+  <div class="card-header">✏️ Update {{ table|capitalize }} #{{ record_id }}</div>
+  <div class="card-body">
+    <form method="POST" action="{{ url_for('edit_record', table=table, record_id=record_id) }}">
+      <div class="form-grid">
+        {% for field in fields %}
+        <div class="form-group">
+          <label for="{{ field }}">{{ field|replace('_',' ')|title }}</label>
+          {% if field == 'publisher_id' and publishers is defined %}
+          <select id="{{ field }}" name="{{ field }}">
+            <option value="">— None —</option>
+            {% for p in publishers %}
+            <option value="{{ p['publisher_id'] }}" {% if record[field] == p['publisher_id'] %}selected{% endif %}>{{ p['name'] }}</option>
+            {% endfor %}
+          </select>
+          {% elif field == 'subscription_type' %}
+          <select id="{{ field }}" name="{{ field }}">
+            {% for t in ['Monthly','Yearly','Lifetime'] %}
+            <option value="{{ t }}" {% if record[field] == t %}selected{% endif %}>{{ t }}</option>
+            {% endfor %}
+          </select>
+          {% elif field == 'p_date' %}
+          <input type="date" id="{{ field }}" name="{{ field }}" value="{{ record[field] or '' }}">
+          {% elif field == 'price' %}
+          <input type="number" id="{{ field }}" name="{{ field }}" step="0.01" min="0" value="{{ record[field] or 0 }}">
+          {% elif field == 'experience' %}
+          <input type="number" id="{{ field }}" name="{{ field }}" min="0" value="{{ record[field] or 0 }}">
+          {% else %}
+          <input type="text" id="{{ field }}" name="{{ field }}" value="{{ record[field] or '' }}">
+          {% endif %}
+        </div>
+        {% endfor %}
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">💾 Save Changes</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

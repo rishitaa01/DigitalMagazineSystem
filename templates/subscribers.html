@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% block title %}Subscribers{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h2><span class="header-icon">👥</span> Subscribers</h2>
+</div>
+
+<div class="card">
+  <div class="card-header">➕ Add New Subscriber</div>
+  <div class="card-body">
+    <form method="POST" action="{{ url_for('subscribers') }}">
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="name">Name</label>
+          <input type="text" id="name" name="name" required placeholder="Subscriber name">
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" required placeholder="subscriber@email.com">
+        </div>
+        <div class="form-group">
+          <label for="phone">Phone</label>
+          <input type="text" id="phone" name="phone" placeholder="555-0000">
+        </div>
+        <div class="form-group">
+          <label for="city">City</label>
+          <input type="text" id="city" name="city" placeholder="e.g. Mumbai">
+        </div>
+        <div class="form-group">
+          <label for="subscription_type">Subscription Type</label>
+          <select id="subscription_type" name="subscription_type" required>
+            <option value="Monthly">Monthly</option>
+            <option value="Yearly">Yearly</option>
+            <option value="Lifetime">Lifetime</option>
+          </select>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">➕ Add Subscriber</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">👥 All Subscribers ({{ subscribers|length }})</div>
+  <div class="card-body">
+    <div class="search-bar">
+      <form method="GET" action="{{ url_for('subscribers') }}" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+        <input type="text" name="search" placeholder="🔍 Search by name or email..." value="{{ search }}">
+        <select name="city">
+          <option value="">All Cities</option>
+          {% for c in cities %}
+          <option value="{{ c['city'] }}" {% if city == c['city'] %}selected{% endif %}>{{ c['city'] }}</option>
+          {% endfor %}
+        </select>
+        <button type="submit" class="btn btn-primary btn-sm">Search</button>
+        {% if search or city %}
+        <a href="{{ url_for('subscribers') }}" class="btn btn-sm btn-edit">Clear</a>
+        {% endif %}
+      </form>
+      <input type="text" id="live-search" placeholder="⚡ Live filter..." style="margin-left:auto;">
+    </div>
+    {% if subscribers %}
+    <div class="table-wrapper">
+      <table>
+        <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>City</th><th>Type</th><th>Subs</th><th>Actions</th></tr></thead>
+        <tbody>
+          {% for s in subscribers %}
+          <tr>
+            <td>{{ s['subscriber_id'] }}</td>
+            <td>{{ s['name'] }}</td>
+            <td>{{ s['email'] }}</td>
+            <td>{{ s['phone'] or '—' }}</td>
+            <td>{{ s['city'] or '—' }}</td>
+            <td>
+              {% if s['subscription_type'] == 'Monthly' %}
+              <span class="badge badge-monthly">Monthly</span>
+              {% elif s['subscription_type'] == 'Yearly' %}
+              <span class="badge badge-yearly">Yearly</span>
+              {% else %}
+              <span class="badge badge-lifetime">Lifetime</span>
+              {% endif %}
+            </td>
+            <td>{{ s['sub_count'] }}</td>
+            <td>
+              <div class="btn-group">
+                <a href="{{ url_for('edit_record', table='subscriber', record_id=s['subscriber_id']) }}" class="btn btn-sm btn-edit">✏️</a>
+                <form method="POST" action="{{ url_for('delete_record', table='subscriber', record_id=s['subscriber_id']) }}" class="delete-form" style="display:inline;">
+                  <button type="submit" class="btn btn-sm btn-delete">🗑️</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty-state"><div class="empty-icon">👥</div><p>No subscribers found.</p></div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

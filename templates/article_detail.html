@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block title %}{{ article['article_title'] }}{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h2><span class="header-icon">📝</span> {{ article['article_title'] }}</h2>
+  <a href="{{ url_for('articles') }}" class="btn btn-sm btn-edit">← Back to Articles</a>
+</div>
+
+<!-- Article Meta -->
+<div class="card">
+  <div class="card-header">Article Details</div>
+  <div class="card-body">
+    <div class="detail-info">
+      <div class="detail-meta">
+        <span>📕 <strong>Magazine:</strong>
+          {% if article['magazine_id'] %}
+          <a href="{{ url_for('magazine_detail', mag_id=article['magazine_id']) }}">{{ article['magazine_title'] }}</a>
+          {% else %}
+          {{ article['magazine_title'] or '—' }}
+          {% endif %}
+        </span>
+        <span>📂 <strong>Category:</strong> {{ article['magazine_category'] or '—' }}</span>
+        <span>📄 <strong>Pages:</strong> {{ article['pages'] }}</span>
+        <span>📅 <strong>Published:</strong> {{ article['article_date'] }}</span>
+        <span>✍️ <strong>Author(s):</strong> {{ article['author_names'] or '—' }}</span>
+        <span>🔍 <strong>Editor(s):</strong> {{ article['editor_names'] or '—' }}</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Article Content -->
+<div class="card">
+  <div class="card-header">📖 Full Article</div>
+  <div class="card-body">
+    {% if article['article_content'] %}
+    <div class="article-content">
+      {% for paragraph in article['article_content'].split('\n\n') %}
+      {% if paragraph.strip() %}
+      <p>{{ paragraph.strip() }}</p>
+      {% endif %}
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-icon">📝</div>
+      <p>No content available for this article.</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

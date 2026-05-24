@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Magazine System{% endblock %} — Digital Magazine Management</title>
+  <meta name="description" content="Digital Magazine Management System — manage publishers, magazines, articles, authors, editors, and subscribers.">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+</head>
+<body>
+<div class="app-layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">📰</div>
+      <div>
+        <h1>MagSystem</h1>
+        <span>Digital Magazine DBMS</span>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">Main</div>
+      <a href="{{ url_for('index') }}" class="{% if request.endpoint == 'index' %}active{% endif %}">
+        <span class="nav-icon">📊</span> Dashboard
+      </a>
+      <a href="{{ url_for('reports') }}" class="{% if request.endpoint == 'reports' %}active{% endif %}">
+        <span class="nav-icon">📈</span> Reports & Analytics
+      </a>
+
+      <div class="nav-section">Content</div>
+      <a href="{{ url_for('magazines') }}" class="{% if request.endpoint in ['magazines','magazine_detail'] %}active{% endif %}">
+        <span class="nav-icon">📕</span> Magazines
+      </a>
+      <a href="{{ url_for('articles') }}" class="{% if request.endpoint == 'articles' %}active{% endif %}">
+        <span class="nav-icon">📝</span> Articles
+      </a>
+
+      <div class="nav-section">People</div>
+      <a href="{{ url_for('publishers') }}" class="{% if request.endpoint == 'publishers' %}active{% endif %}">
+        <span class="nav-icon">🏢</span> Publishers
+      </a>
+      <a href="{{ url_for('authors') }}" class="{% if request.endpoint == 'authors' %}active{% endif %}">
+        <span class="nav-icon">✍️</span> Authors
+      </a>
+      <a href="{{ url_for('editors') }}" class="{% if request.endpoint == 'editors' %}active{% endif %}">
+        <span class="nav-icon">🔍</span> Editors
+      </a>
+
+      <div class="nav-section">Subscriptions</div>
+      <a href="{{ url_for('subscribers') }}" class="{% if request.endpoint == 'subscribers' %}active{% endif %}">
+        <span class="nav-icon">👥</span> Subscribers
+      </a>
+      <a href="{{ url_for('subscriptions') }}" class="{% if request.endpoint == 'subscriptions' %}active{% endif %}">
+        <span class="nav-icon">💳</span> Subscriptions
+      </a>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flash-messages">
+      {% for category, message in messages %}
+      <div class="flash flash-{{ category }}">
+        {% if category == 'success' %}✅{% else %}⚠️{% endif %}
+        {{ message }}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </main>
+</div>
+
+<!-- Mobile Toggle -->
+<button class="sidebar-toggle" id="sidebar-toggle">☰</button>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

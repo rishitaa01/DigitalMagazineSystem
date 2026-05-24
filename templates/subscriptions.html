@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% block title %}Subscriptions{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h2><span class="header-icon">💳</span> Subscriptions</h2>
+</div>
+
+<div class="card">
+  <div class="card-header">➕ Add New Subscription</div>
+  <div class="card-body">
+    <form method="POST" action="{{ url_for('subscriptions') }}">
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="subscriber_id">Subscriber</label>
+          <select id="subscriber_id" name="subscriber_id" required>
+            <option value="">— Select Subscriber —</option>
+            {% for s in subscribers %}
+            <option value="{{ s['subscriber_id'] }}">{{ s['name'] }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="mag_id">Magazine</label>
+          <select id="mag_id" name="mag_id" required>
+            <option value="">— Select Magazine —</option>
+            {% for m in magazines %}
+            <option value="{{ m['mag_id'] }}">{{ m['title'] }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="start_date">Start Date</label>
+          <input type="date" id="start_date" name="start_date" required>
+        </div>
+        <div class="form-group">
+          <label for="end_date">End Date</label>
+          <input type="date" id="end_date" name="end_date" required>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">➕ Add Subscription</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">💳 All Subscriptions ({{ subscriptions|length }})</div>
+  <div class="card-body">
+    <input type="text" id="live-search" placeholder="⚡ Live filter..." style="margin-bottom:16px;width:300px;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-sm);padding:9px 14px;color:var(--text-primary);font-family:inherit;">
+    {% if subscriptions %}
+    <div class="table-wrapper">
+      <table>
+        <thead><tr><th>ID</th><th>Subscriber</th><th>Magazine</th><th>Start</th><th>End</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>
+          {% for s in subscriptions %}
+          <tr>
+            <td>{{ s['subscription_id'] }}</td>
+            <td>{{ s['subscriber_name'] }}</td>
+            <td>{{ s['magazine_title'] }}</td>
+            <td>{{ s['start_date'] }}</td>
+            <td>{{ s['end_date'] }}</td>
+            <td>
+              {% if s['end_date'] >= now %}
+              <span class="badge badge-active">Active</span>
+              {% else %}
+              <span class="badge badge-expired">Expired</span>
+              {% endif %}
+            </td>
+            <td>
+              <form method="POST" action="{{ url_for('delete_record', table='subscription', record_id=s['subscription_id']) }}" class="delete-form" style="display:inline;">
+                <button type="submit" class="btn btn-sm btn-delete">🗑️</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty-state"><div class="empty-icon">💳</div><p>No subscriptions found.</p></div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

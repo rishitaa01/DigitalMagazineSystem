@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% block title %}Authors{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h2><span class="header-icon">✍️</span> Authors</h2>
+</div>
+
+<div class="card">
+  <div class="card-header">➕ Add New Author</div>
+  <div class="card-body">
+    <form method="POST" action="{{ url_for('authors') }}">
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="name">Name</label>
+          <input type="text" id="name" name="name" required placeholder="Author name">
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" required placeholder="author@email.com">
+        </div>
+        <div class="form-group">
+          <label for="phone">Phone</label>
+          <input type="text" id="phone" name="phone" placeholder="555-0000">
+        </div>
+        <div class="form-group">
+          <label for="specialization">Specialization</label>
+          <input type="text" id="specialization" name="specialization" placeholder="e.g. Technology">
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">➕ Add Author</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">✍️ All Authors ({{ authors|length }})</div>
+  <div class="card-body">
+    <div class="search-bar">
+      <form method="GET" action="{{ url_for('authors') }}" style="display:flex;gap:10px;align-items:center;">
+        <input type="text" name="search" placeholder="🔍 Search by name or specialization..." value="{{ search }}">
+        <button type="submit" class="btn btn-primary btn-sm">Search</button>
+        {% if search %}<a href="{{ url_for('authors') }}" class="btn btn-sm btn-edit">Clear</a>{% endif %}
+      </form>
+      <input type="text" id="live-search" placeholder="⚡ Live filter..." style="margin-left:auto;">
+    </div>
+    {% if authors %}
+    <div class="table-wrapper">
+      <table>
+        <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Specialization</th><th>Articles</th><th>Actions</th></tr></thead>
+        <tbody>
+          {% for a in authors %}
+          <tr>
+            <td>{{ a['author_id'] }}</td>
+            <td>{{ a['name'] }}</td>
+            <td>{{ a['email'] }}</td>
+            <td>{{ a['phone'] or '—' }}</td>
+            <td><span class="badge badge-monthly">{{ a['specialization'] or '—' }}</span></td>
+            <td><span class="badge badge-lifetime">{{ a['article_count'] }}</span></td>
+            <td>
+              <div class="btn-group">
+                <a href="{{ url_for('edit_record', table='author', record_id=a['author_id']) }}" class="btn btn-sm btn-edit">✏️</a>
+                <form method="POST" action="{{ url_for('delete_record', table='author', record_id=a['author_id']) }}" class="delete-form" style="display:inline;">
+                  <button type="submit" class="btn btn-sm btn-delete">🗑️</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty-state"><div class="empty-icon">✍️</div><p>No authors found.</p></div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
